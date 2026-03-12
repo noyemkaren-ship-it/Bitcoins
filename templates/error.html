@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка входа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .error-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            width: 450px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        h1 {
+            color: #f5576c;
+            font-size: 28px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 2px;
+        }
+
+        .error-message {
+            color: #666;
+            font-size: 16px;
+            margin: 25px 0;
+            line-height: 1.6;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #f5576c;
+            text-align: left;
+        }
+
+        .error-details {
+            background: #fff3f3;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .error-details p {
+            margin: 5px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .help-text {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .help-text a {
+            color: #f5576c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .help-text a:hover {
+            color: #f093fb;
+            text-decoration: underline;
+        }
+
+        .countdown {
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        .countdown span {
+            font-weight: 700;
+            color: #f5576c;
+            font-size: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .error-container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <h1>Ошибка входа!</h1>
+
+        <div class="error-message">
+            <strong>Неверное имя пользователя или пароль</strong><br>
+            Пожалуйста, проверьте введенные данные и попробуйте снова.
+        </div>
+
+        <div class="error-details">
+            <p>🔐 Возможные причины:</p>
+            <p>• Неправильно введено имя пользователя</p>
+            <p>• Неправильно введен пароль</p>
+            <p>• Пользователь не найден в системе</p>
+            <p>• Пароль чувствителен к регистру</p>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary">◀ Вернуться ко входу</a>
+            <a href="/reg" class="btn btn-secondary">📝 Зарегистрироваться</a>
+        </div>
+
+        <div class="countdown">
+            Автоматический возврат через <span id="timer">5</span> секунд
+        </div>
+
+        <div class="help-text">
+            Нужна помощь? <a href="#">Связаться с поддержкой</a>
+        </div>
+    </div>
+
+    <script>
+        // Таймер обратного отсчета
+        let seconds = 5;
+        const timerSpan = document.getElementById('timer');
+
+        const countdown = setInterval(() => {
+            seconds--;
+            timerSpan.textContent = seconds;
+
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                window.location.href = '/';
+            }
+        }, 1000);
+
+        // Добавляем анимацию пульсации для иконки
+        const errorIcon = document.querySelector('.error-icon');
+        setInterval(() => {
+            errorIcon.style.animation = 'pulse 1s ease-in-out';
+            setTimeout(() => {
+                errorIcon.style.animation = '';
+            }, 1000);
+        }, 3000);
+
+        // Сохраняем введенные данные для удобства
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('name');
+
+            if (username) {
+                console.log('Попытка входа для пользователя:', username);
+            }
+        });
+
+        // Предотвращаем кэширование страницы
+        window.onload = function() {
+            if (window.performance) {
+                if (performance.navigation.type == 2) {
+                    location.reload(true);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
