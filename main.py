@@ -1,5 +1,4 @@
-import datetime
-
+from datetime import datetime
 from starlette.templating import Jinja2Templates
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
