@@ -14,6 +14,8 @@ ALLOWED_IPS = ["176.195.22.127", "127.0.0.1"]
 @app.middleware("http")
 async def ip_filter(request: Request, call_next):
     if request.client.host not in ALLOWED_IPS:
+        print("КТО ТО СТАРАЛСЯ ЗАЙТИ В DOCS")
+        print("Я ЕО ЗАБЛОКИРОВАЛ!")
         return JSONResponse(status_code=403, content={"error": "Access denied"})
     return await call_next(request)
 
