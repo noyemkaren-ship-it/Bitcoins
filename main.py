@@ -8,7 +8,6 @@ from fastapi.responses import JSONResponse
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 tipp = []
-
 ALLOWED_IPS = ["176.195.22.127", "127.0.0.1"]
 
 @app.middleware("http")

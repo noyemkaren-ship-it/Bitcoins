@@ -3,106 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пополнение баланса</title>
+    <title>Мой баланс</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
             padding: 20px;
         }
+
         .container {
             background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            max-width: 600px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         h1 {
             color: #333;
             margin-bottom: 30px;
-            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 600;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
+
+        .balance-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .balance-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-amount {
             color: white;
+            font-size: 72px;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .balance-currency {
+            font-size: 36px;
+            margin-left: 10px;
+            opacity: 0.9;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .user-details {
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            color: #28a745;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-status::before {
+            content: '●';
+            font-size: 12px;
+            color: #28a745;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
+            transition: all 0.3s ease;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            transform: translateY(-3px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .update-time {
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 10px;
+        }
+
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>💰 Пополнение баланса</h1>
-        <form id="topupForm">
-            <div class="form-group">
-                <label>Имя пользователя:</label>
-                <input type="text" id="username" value="{{ username }}" readonly>
+        <h1>💳 Мой баланс</h1>
+
+        <div class="user-info">
+            <div class="user-avatar">
+                {{ name[0]|upper if name else '?' }}
             </div>
-            <div class="form-group">
-                <label>Сумма пополнения (KAREN/USD):</label>
-                <input type="number" id="amount" min="1" required placeholder="Введите сумму">
+            <div class="user-details">
+                <div class="user-name">{{ name if name else 'Гость' }}</div>
+                <div class="user-status">Активен</div>
             </div>
-            <button type="submit">Подтвердить</button>
-        </form>
-        <a href="/" class="back-link">← Вернуться на главную</a>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-label">Текущий баланс</div>
+            <div class="balance-amount">
+                {{ balance if balance else '0.00' }} <span class="balance-currency">KAREN/USD</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-label">ID пользователя</div>
+                <div class="stat-value">#{{ user_id if user_id else 'N/A' }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Дата регистрации</div>
+                <div class="stat-value">{{ reg_date if reg_date else 'Сегодня' }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Всего операций</div>
+                <div class="stat-value">{{ operations if operations else '0' }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Бонусов начислено</div>
+                <div class="stat-value">{{ bonus if bonus else '0' }} KAREN/USD</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/user/pl/balance?user_name={{ name }}" class="btn btn-primary" onclick="return checkUsername()">
+                💰 Пополнить
+            </a>
+            <a href="/history?name={{ name }}" class="btn btn-secondary" onclick="return checkUsername()">
+                📊 История
+            </a>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <a href="/" class="btn btn-secondary" style="background: #f8f9fa; color: #6c757d; border-color: #dee2e6;">
+                ← На главную
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>Актуально на <span id="current-time">{{ current_time if current_time else 'только что' }}</span></p>
+            <div class="update-time">
+                Обновляется в реальном времени
+            </div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('topupForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const amount = document.getElementById('amount').value;
-
-            // Отправляем запрос на API
-            const response = await fetch(`/user/pl/balance?user_name=${username}&bl=${amount}`);
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                alert(`✅ Заявка создана!\nСумма: ${amount} KAREN/USD\nРеквизиты отправлены в консоль`);
-                window.location.href = '/';
-            } else {
-                alert(`❌ Ошибка: ${result.message}`);
+        // Функция проверки имени пользователя
+        function checkUsername() {
+            const username = '{{ name }}';
+            if (!username || username === 'None' || username === '') {
+                alert('❌ Ошибка: имя пользователя не указано');
+                return false;
             }
-        };
+            return true;
+        }
+
+        // Автоматическое обновление баланса каждые 30 секунд
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+
+        // Анимация цифр при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const balanceElement = document.querySelector('.balance-amount');
+
+            if (balanceElement) {
+                // Добавляем класс для анимации
+                balanceElement.style.transition = 'all 0.5s ease';
+
+                // Небольшая анимация появления
+                balanceElement.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    balanceElement.style.transform = 'scale(1)';
+                }, 100);
+            }
+
+            // Обновляем время
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        });
+
+        // Функция обновления времени
+        function updateCurrentTime() {
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                const now = new Date();
+                const options = {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                };
+                timeElement.textContent = now.toLocaleString('ru-RU', options);
+            }
+        }
+
+        // Загружаем реальный баланс с сервера
+        async function loadBalance() {
+            const username = '{{ name }}';
+            if (!username || username === 'None' || username === '') return;
+
+            try {
+                const response = await fetch(`/user/pl/balance?user_name=${username}`);
+                const data = await response.json();
+
+                if (data.status === 'success' && data.balance !== undefined) {
+                    const balanceElement = document.querySelector('.balance-amount');
+                    if (balanceElement) {
+                        const oldBalance = balanceElement.innerHTML;
+                        balanceElement.innerHTML = data.balance + ' <span class="balance-currency">KAREN/USD</span>';
+
+                        // Показываем уведомление если баланс изменился
+                        if (oldBalance !== data.balance) {
+                            showNotification('Баланс обновлен', 'success');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки баланса:', error);
+            }
+        }
+
+        // Функция показа уведомлений
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Загружаем баланс при загрузке страницы и каждые 10 секунд
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем баланс через 1 секунду после загрузки страницы
+            setTimeout(loadBalance, 1000);
+
+            // Обновляем баланс каждые 10 секунд
+            setInterval(loadBalance, 10000);
+        });
     </script>
 </body>
 </html>
