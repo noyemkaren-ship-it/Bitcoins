@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пополнение баланса</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .balance-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%);
+        }
+
+        .payment-details {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            display: none;
+            border: 2px solid #667eea;
+        }
+
+        .payment-details.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .payment-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .detail-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .detail-icon {
+            font-size: 24px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .detail-value.small {
+            font-size: 14px;
+        }
+
+        .amount-display {
+            background: #e8f0fe;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .loader.show {
+            display: block;
+        }
+
+        .loader-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Пополнение баланса</h1>
+        <p class="subtitle">Введите сумму для пополнения</p>
+
+        <div class="balance-form">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="username" placeholder="Введите ваше имя" value="test_user">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Сумма пополнения (₽)</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">₽</span>
+                    <input type="number" id="amount" placeholder="Введите сумму" min="1" step="1">
+                </div>
+            </div>
+
+            <button class="btn" onclick="showPaymentDetails()" id="showDetailsBtn">
+                Подтвердить сумму
+            </button>
+
+            <!-- Блок с реквизитами (появляется после подтверждения суммы) -->
+            <div class="payment-details" id="paymentDetails">
+                <div class="payment-title">
+                    💳 Реквизиты для перевода
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">📞</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Номер телефона</div>
+                        <div class="detail-value">+7 (904) 059-73-43</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">👤</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Получатель</div>
+                        <div class="detail-value">Нагапетян</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">🏦</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Банк</div>
+                        <div class="detail-value">Альфа-Банк</div>
+                    </div>
+                </div>
+
+                <div class="amount-display" id="selectedAmount">
+                    Сумма к оплате: 0 ₽
+                </div>
+
+                <div class="info-text">
+                    ⚠️ После перевода нажмите кнопку "Я оплатил"
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="copyDetails()">
+                        📋 Копировать реквизиты
+                    </button>
+                    <button class="btn" onclick="confirmPayment()" id="confirmPaymentBtn">
+                        ✅ Я оплатил
+                    </button>
+                </div>
+
+                <!-- Индикатор загрузки -->
+                <div class="loader" id="loader">
+                    <div class="loader-spinner"></div>
+                    <p style="margin-top: 10px;">Обработка платежа...</p>
+                </div>
+
+                <!-- Сообщение об успехе -->
+                <div class="success-message" id="successMessage">
+                    ✅ Платеж подтвержден! Баланс будет пополнен в течение нескольких минут.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAmount = 0;
+        let userName = '';
+
+        function showPaymentDetails() {
+            const amount = document.getElementById('amount').value;
+            const username = document.getElementById('username').value;
+
+            if (!username) {
+                alert('Пожалуйста, введите имя пользователя');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                alert('Пожалуйста, введите корректную сумму');
+                return;
+            }
+
+            userName = username;
+            currentAmount = parseInt(amount);
+
+            // Показываем реквизиты
+            document.getElementById('paymentDetails').classList.add('show');
+            document.getElementById('selectedAmount').textContent = `Сумма к оплате: ${currentAmount} ₽`;
+
+            // Отправляем запрос на бэкенд
+            fetch(`/user/pl/balance?user_name=${encodeURIComponent(userName)}&bl=${currentAmount}`)
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Запрос отправлен на бэкенд');
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+
+            // Прокручиваем к реквизитам
+            document.getElementById('paymentDetails').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyDetails() {
+            const details = `Номер телефона: +7 (904) 059-73-43\nПолучатель: Нагапетян\nБанк: Альфа-Банк\nСумма: ${currentAmount} ₽`;
+
+            navigator.clipboard.writeText(details).then(() => {
+                alert('✅ Реквизиты скопированы в буфер обмена');
+            }).catch(err => {
+                console.error('Ошибка копирования:', err);
+                alert('❌ Не удалось скопировать реквизиты');
+            });
+        }
+
+        function confirmPayment() {
+            if (!currentAmount) {
+                alert('Сначала подтвердите сумму');
+                return;
+            }
+
+            // Показываем загрузку
+            document.getElementById('loader').classList.add('show');
+            document.getElementById('confirmPaymentBtn').disabled = true;
+
+            // Отправляем подтверждение платежа на бэкенд
+            fetch(`/user/pl/balance/confirm?user_name=${encodeURIComponent(userName)}&bl=${currentAmount}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Скрываем загрузку и показываем успех
+                    document.getElementById('loader').classList.remove('show');
+                    document.getElementById('successMessage').classList.add('show');
+
+                    // Выводим в консоль для бэкенда
+                    console.log(`✅ ${userName} подтверждает перевод на сумму ${currentAmount} ₽`);
+                    console.log('Реквизиты: +79040597343 Нагапетян (Альфа-Банк)');
+
+                    // Через 3 секунды скрываем сообщение
+                    setTimeout(() => {
+                        document.getElementById('successMessage').classList.remove('show');
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('loader').classList.remove('show');
+                document.getElementById('confirmPaymentBtn').disabled = false;
+                alert('❌ Ошибка при подтверждении платежа');
+            });
+        }
+
+        // Добавляем обработчик для Enter
+        document.getElementById('amount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                showPaymentDetails();
+            }
+        });
+    </script>
+</body>
+</html>

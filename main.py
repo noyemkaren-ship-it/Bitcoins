@@ -49,3 +49,64 @@ async def reg(request: Request):
 async def get_users():
     users = get_all_users()
     return {"users": [{"id": u.id, "name": u.title} for u in users]}
+
+
+@app.get("/user/pl/balance")
+async def top_up_balance(user_name: str, bl: int):
+    try:
+        user = get_user_name(user_name)
+        if user:
+            print(f"✅ {user.title} (ID: {user.id}) подтверждает перевод на сумму {bl} RUB")
+            print(f"📞 Реквизиты: +79040597343 Нагапетян (Альфа-Банк)")
+            return {
+                "status": "success",
+                "message": f"Запрос на пополнение {bl} RUB для {user_name} получен",
+                "user_id": user.id,
+                "current_balance": user.coins
+            }
+        else:
+            return {
+                "status": "error",
+                "message": f"Пользователь '{user_name}' не найден"
+            }, 404
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": str(e)}, 500
+
+
+@app.get("/bl")
+async def bl(request: Request):
+    return templates.TemplateResponse("bell.html", {"request": request})
+
+@app.get("/ball")
+async def bl(request: Request, name: str):
+    user = get_user_name(name)
+    if user:
+        return templates.TemplateResponse("ball.html", {
+            "request": request,
+            "balance": user.coins,
+            "name": name,
+            "user_id": user.id
+        })
+    else:
+        return templates.TemplateResponse("error.html", {
+            "request": request,
+            "error": f"Пользователь '{name}' не найден"
+        })
+
+
+@app.get("/update/balance")
+async def update(id_user: int, balance: int):
+    update_balance(id_user, balance)
+
+
+@app.get("/user/{user_id}/name")
+async def get_user_name_by_id(user_id: int):
+    user = get_user(user_id)
+
+    if user:
+        return user.title
+    else:
+        return f"Пользователь с ID {user_id} не найден"

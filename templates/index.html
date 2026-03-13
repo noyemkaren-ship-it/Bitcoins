@@ -618,6 +618,7 @@
 <body>
     <div class="container">
         <!-- Верхняя панель с курсами валют -->
+        <!-- Верхняя панель с курсами валют -->
         <div class="forex-bar">
             <div class="forex-item">
                 <div class="currency-card">
@@ -635,12 +636,242 @@
                     </div>
                 </div>
             </div>
+
             <div class="update-time">
                 <span class="dot"></span>
                 <span id="last-update">Обновлено: только что</span>
             </div>
+
+            <!-- ССЫЛКА НА ПОПОЛНЕНИЕ (берет имя из URL) -->
+            <div class="update-time">
+                <span class="dot" style="background: var(--primary);"></span>
+                <a href="/user/pl/balance?user_name={{ username }}" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                    💰 Пополнить
+                </a>
+            </div>
+
+            <!-- ССЫЛКА НА БАЛАНС (берет имя из URL) -->
+            <div class="update-time">
+                <span class="dot" style="background: var(--success);"></span>
+                <a href="/ball?name={{ username }}" style="color: var(--success); text-decoration: none; font-weight: 600;">
+                    👤 Мой баланс
+                </a>
+            </div>
+
+            <!-- Имя пользователя (для информации) -->
+            <div class="update-time">
+                <span class="dot" style="background: var(--warning);"></span>
+                <span style="color: var(--warning); font-weight: 600;">{{ username }}</span>
+            </div>
+        </div>
         </div>
 
+        <!-- Стили для модального окна -->
+        <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 12, 26, 0.95);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--primary);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        </style>
+
+        <script>
+        // Функции для модального окна
+        function showLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        // Обработка входа
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Показываем загрузку
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Вход...';
+            submitBtn.disabled = true;
+
+            try {
+                // Отправляем запрос на /log
+                const response = await fetch(`/log?name=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+
+                // Получаем HTML ответ
+                const html = await response.text();
+
+                // Создаем временный DOM элемент для анализа ответа
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+
+                // Проверяем, есть ли ошибка
+                if (temp.querySelector('.error-container') || html.includes('Неверное имя')) {
+                    // Показываем ошибку
+                    alert('❌ Неверное имя пользователя или пароль');
+
+                    // Возвращаем кнопку в исходное состояние
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                } else {
+                    // Успешный вход - сохраняем username и перенаправляем
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('isLoggedIn', 'true');
+
+                    // Показываем сообщение об успехе
+                    showNotification('✅ Успешный вход! Перенаправление...', 'success');
+
+                    // Перенаправляем на главную с username
+                    setTimeout(() => {
+                        window.location.href = `/?username=${encodeURIComponent(username)}`;
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                alert('❌ Ошибка при входе. Попробуйте позже');
+
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Функция для показа уведомлений
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 2000;
+                animation: slideInRight 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Проверка авторизации при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const username = localStorage.getItem('username');
+
+            if (isLoggedIn && username) {
+                // Меняем кнопку входа на кнопку профиля
+                const loginBtn = document.querySelector('[onclick="showLoginModal()"]');
+                if (loginBtn) {
+                    loginBtn.innerHTML = `
+                        <span class="dot" style="background: var(--success);"></span>
+                        <span style="color: var(--success);">👤 ${username}</span>
+                    `;
+                    loginBtn.onclick = () => window.location.href = `/ball?name=${encodeURIComponent(username)}`;
+                }
+            }
+        });
+
+        // Функция выхода
+        function logout() {
+            localStorage.removeItem('username');
+            localStorage.removeItem('isLoggedIn');
+            window.location.reload();
+        }
+
+        // Добавляем стили для анимаций
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        </script>
+    </div>
         <!-- Заголовок -->
         <h1 style="font-size: 28px; margin-bottom: 20px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             🚀 Крипто-дашборд LIVE
