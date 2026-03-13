@@ -3,11 +3,20 @@ from starlette.templating import Jinja2Templates
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from database import  *
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
 tipp = []
+
+ALLOWED_IPS = ["176.195.22.127", "127.0.0.1"]
+
+@app.middleware("http")
+async def ip_filter(request: Request, call_next):
+    if request.client.host not in ALLOWED_IPS:
+        return JSONResponse(status_code=403, content={"error": "Access denied"})
+    return await call_next(request)
+
 
 @app.get("/")
 async def login(request: Request):
@@ -55,7 +64,6 @@ async def get_users():
 
 @app.get("/oll/tap_up")
 async def tp():
-    """Просмотр всех заявок на пополнение"""
     return {
         "total": len(tipp),
         "transactions": tipp
@@ -101,6 +109,7 @@ async def top_up_balance(user_name: str, bl: int):
 async def bl(request: Request):
     return templates.TemplateResponse("bell.html", {"request": request})
 
+
 @app.get("/ball")
 async def bl(request: Request, name: str):
     user = get_user_name(name)
@@ -126,7 +135,6 @@ async def update(id_user: int, balance: int):
 @app.get("/user/{user_id}/name")
 async def get_user_name_by_id(user_id: int):
     user = get_user(user_id)
-
     if user:
         return user.title
     else:
