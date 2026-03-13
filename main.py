@@ -1,3 +1,5 @@
+import datetime
+
 from starlette.templating import Jinja2Templates
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
@@ -6,6 +8,7 @@ from database import  *
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+tipp = []
 
 @app.get("/")
 async def login(request: Request):
@@ -51,29 +54,48 @@ async def get_users():
     return {"users": [{"id": u.id, "name": u.title} for u in users]}
 
 
+@app.get("/oll/tap_up")
+async def tp():
+    """Просмотр всех заявок на пополнение"""
+    return {
+        "total": len(tipp),
+        "transactions": tipp
+    }
+
+
 @app.get("/user/pl/balance")
 async def top_up_balance(user_name: str, bl: int):
     try:
         user = get_user_name(user_name)
-        if user:
-            print(f"✅ {user.title} (ID: {user.id}) подтверждает перевод на сумму {bl} RUB")
-            print(f"📞 Реквизиты: +79040597343 Нагапетян (Альфа-Банк)")
-            return {
-                "status": "success",
-                "message": f"Запрос на пополнение {bl} RUB для {user_name} получен",
-                "user_id": user.id,
-                "current_balance": user.coins
-            }
-        else:
+
+        if not user:
             return {
                 "status": "error",
                 "message": f"Пользователь '{user_name}' не найден"
             }, 404
-
+        tipp.append({
+            "name": user.title,
+            "bl": bl,
+            "user_id": user.id,
+            "timestamp": str(datetime.now())  # добавляем время
+        })
+        print(f"✅ {user.title} (ID: {user.id}) подтверждает перевод на сумму {bl} RUB")
+        print(f"📞 Реквизиты: +79040597343 Нагапетян (Альфа-Банк)")
+        return {
+            "status": "success",
+            "message": f"Запрос на пополнение {bl} RUB для {user_name} получен",
+            "user_id": user.id,
+            "user_name": user.title,
+            "current_balance": user.coins,
+            "transaction_id": len(tipp) - 1
+        }
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return {"status": "error", "message": str(e)}, 500
+        return {
+            "status": "error",
+            "message": f"Внутренняя ошибка сервера: {str(e)}"
+        }, 500
 
 
 @app.get("/bl")
