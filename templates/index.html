@@ -643,13 +643,21 @@
             </div>
 
             <!-- ССЫЛКА НА ПОПОЛНЕНИЕ (берет имя из URL) -->
-            <<div class="update-time">
+            <div class="update-time">
                 <span class="dot" style="background: var(--primary);"></span>
-                <a href="/user/pl/balance?user_name={{ username }}&bl=100"
-                   style="color: var(--primary); text-decoration: none; font-weight: 600;">
-                    💰 Пополнить (100 RUB)
+                <a href="#" onclick="topUpBalance()" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                    💰 Пополнить
                 </a>
             </div>
+
+            <script>
+            function topUpBalance() {
+                const amount = prompt('Введите сумму пополнения (RUB):', '100');
+                if (amount && amount > 0) {
+                    window.location.href = `/user/pl/balance?user_name={{ username }}&bl=${amount}`;
+                }
+            }
+            </script>
 
             <!-- ССЫЛКА НА БАЛАНС (берет имя из URL) -->
             <div class="update-time">
