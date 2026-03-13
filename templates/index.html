@@ -651,13 +651,21 @@
             </div>
 
             <script>
-            function topUpBalance() {
-                const amount = prompt('Введите сумму пополнения (RUB):', '100');
-                if (amount && amount > 0) {
-                    window.location.href = `/user/pl/balance?user_name={{ username }}&bl=${amount}`;
+                function topUpBalance() {
+                    const amount = prompt('Введите сумму пополнения (RUB):', '100');
+                    if (amount && amount > 0) {
+                        // Показываем реквизиты для перевода
+                        alert(`💰 Перевод на сумму ${amount} RUB\n\n` +
+                              `📞 Номер: +7 (904) 059-73-43\n` +
+                              `👤 Получатель: Нагапетян\n` +
+                              `🏦 Банк: Альфа-Банк\n\n` +
+                              `✅ После перевода нажмите ОК для подтверждения`);
+
+                        // Отправляем запрос на сервер
+                        window.location.href = `/user/pl/balance?user_name={{ username }}&bl=${amount}`;
+                    }
                 }
-            }
-            </script>
+                </script>
 
             <!-- ССЫЛКА НА БАЛАНС (берет имя из URL) -->
             <div class="update-time">
