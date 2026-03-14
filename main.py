@@ -1,7 +1,7 @@
 
 from starlette.templating import Jinja2Templates
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse
 from datetime import datetime
 from database import *
 
