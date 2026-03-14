@@ -9,15 +9,20 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 tipp = []
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.responses import JSONResponse
 
 class BlockDocsMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.url.path in ['/docs', '/redoc', '/openapi.json']:
-            return JSONResponse(
-                status_code=403,
-                content={"detail": "Доступ запрещен"}
-            )
+            client_ip = request.client.host
+            allowed_prefixes = ['176.195.', '127.']
+            if not any(client_ip.startswith(prefix) for prefix in allowed_prefixes):
+                return JSONResponse(
+                    status_code=403,
+                    content={"detail": "Доступ запрещен для вашего IP"}
+                )
         return await call_next(request)
+
 
 app.add_middleware(BlockDocsMiddleware)
 
