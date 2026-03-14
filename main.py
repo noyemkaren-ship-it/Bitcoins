@@ -129,13 +129,6 @@ security_manager = SecurityManager()
 app.add_middleware(SecureHeadersMiddleware)
 app.add_middleware(IPProtectionMiddleware, security_manager=security_manager)
 
-@app.on_event("startup")
-def schedule_cleanup():
-    loop = asyncio.get_running_loop()
-    loop.call_later(60 * 5, lambda: asyncio.ensure_future(security_manager.clear_old_attempts()))
-    loop.call_later(60 * 60, lambda: asyncio.ensure_future(security_manager.unban_expired_ips()))
-
-
 @app.get("/")
 async def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
