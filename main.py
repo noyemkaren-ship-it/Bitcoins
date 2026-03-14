@@ -8,6 +8,19 @@ from database import *
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 tipp = []
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class BlockDocsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path in ['/docs', '/redoc', '/openapi.json']:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Доступ запрещен"}
+            )
+        return await call_next(request)
+
+app.add_middleware(BlockDocsMiddleware)
+
 @app.get("/")
 async def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
